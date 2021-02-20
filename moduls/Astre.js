@@ -10,6 +10,11 @@ class Astre {
         this.angleRotacio = angleRotacio;
         this.descripcio = descripcio;
     }
+
+    calculArea() {
+        return this.radi*this.radi*Math.PI;
+    }
+
 }
 
 export {Astre as Astre};

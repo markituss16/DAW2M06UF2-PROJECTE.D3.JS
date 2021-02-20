@@ -1,0 +1,26 @@
+.water {
+    fill: #6296A3;
+}
+
+.land {
+    fill: #A98B6F;
+    stroke: #FFF;
+    stroke-width: 0.7px;
+}
+
+.countryTooltip {
+    position: absolute;
+    display: none;
+    pointer-events: none;
+    background: #fff;
+    padding: 5px;
+    text-align: left;
+    border: solid #ccc 1px;
+    color: #666;
+    font-size: 14px;
+    font-family: sans-serif;
+}
+
+.form-range{
+    width: 50rem;
+}
