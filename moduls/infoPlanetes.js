@@ -4,24 +4,13 @@ var margin = {top: 100, right: 50, bottom: 100, left: 50 };
 
 var width = 1300 - margin.left - margin.right, height = 400 - margin.top - margin.bottom;
 
-var starArea = d3.select("svg").append("g");
+var svg = d3.select("body").append("svg")
+.attr("width", width + margin.left + margin.right)
+.attr("height", height + margin.top + margin.bottom)
+.append("g")
+.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var config = {padding: 10, axisMultiplier: 1.4, velocity: [0.01, 0], starRadius: 1, glowRadius: 2 };
-
-function generateStars(number) {
-    var stars = starArea.selectAll("circle")
-        .data(d3.range(number).map( d =>  d = {
-                x: Math.random() * (width + margin.left + margin.right),
-                y: Math.random() * (height + margin.top + margin.bottom),
-                r: Math.random() * config.starRadius
-            }
-        ))
-        .enter().append("circle")
-        .attr("class", "star")
-        .attr("cx", d => d.x)
-        .attr("cy", d => d.y)
-        .attr("r", d => d.r);
-}
 
 function displayPlanets(cfg, planets) {
     d3.select("svg").remove();
@@ -33,15 +22,16 @@ function displayPlanets(cfg, planets) {
     var definitions = d3.select("svg").append("defs");
     var filter = definitions.append("filter")
         .attr("id", "glow");
-    filter.append("feGaussianBlur")
+        filter.append("feGaussianBlur")
         .attr("class", "blur")
         .attr("stdDeviation", config.glowRadius)
         .attr("result", "coloredBlur");
     var feMerge = filter.append("feMerge")
-    feMerge.append("feMergeNode")
+        feMerge.append("feMergeNode")
         .attr("in", "coloredBlur");
-    feMerge.append("feMergeNode")
+        feMerge.append("feMergeNode")
         .attr("in", "SourceGraphic");
+
     var boundingSize = (width / planets.length) - cfg.padding;
 
     var boundingArea = svg.append("g")
@@ -139,47 +129,36 @@ function displayPlanets(cfg, planets) {
             .datum(graticule.step([graticuleScale(data.radi), graticuleScale(data.radi)]))
             .attr("d", path);
 
-        d3.timer(function (elapsed) {
+        d3.timer((elapsed) => {
             projection.rotate([rotation[0] + elapsed * cfg.velocity[0] / data.periode, rotation[1] + elapsed * cfg.velocity[1] / data.periode, rotation[2]]);
             gridLines.attr("d", path);
         })
     }
 }
 
-function showInfo(d) {
-    d3.select(this).select("g.info")
-        .transition()
-        .style("opacity", 1);
-}
+//Ús de funcions dinàmiques
+var showInfo = new Function("d", "d3.select(this).select(\"g.info\") .transition() .style(\"opacity\",1)");
+var hideInfo = new Function("d", "d3.select(this).select(\"g.info\") .transition() .style(\"opacity\",0)");
 
-function hideInfo(d) {
-    d3.select(this).select("g.info")
-        .transition()
-        .style("opacity", 0);
-}
-
-generateStars(500);
 displayPlanets(config, SISTEMASOLAR);
 
 document.getElementById("radius_button").addEventListener("click", function () {
-    SISTEMASOLAR.sort(function (a, b) {
+    SISTEMASOLAR.sort((a, b) => {
         return b.radi - a.radi;
     });
     displayPlanets(config, SISTEMASOLAR);
 });
 
 document.getElementById("weight_button").addEventListener("click", function () {
-    SISTEMASOLAR.sort(function (a, b) {
+    SISTEMASOLAR.sort((a, b) => {
         return b.massa - a.massa;
     });
     displayPlanets(config, SISTEMASOLAR);
 });
 
 document.getElementById("period_button").addEventListener("click", function () {
-    SISTEMASOLAR.sort(function (a, b) {
+    SISTEMASOLAR.sort((a, b) => {
         return b.periode - a.periode;
     });
     displayPlanets(config, SISTEMASOLAR);
 });
-
-starArea.lower();
