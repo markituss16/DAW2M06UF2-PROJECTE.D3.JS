@@ -1,122 +1,112 @@
 import { SISTEMASOLAR } from './sistemaSolar.js';
 
-//windows.onload = function() {
-//Declaracions de variables per a definir el fons
-var marge = {top: 50, right: 50, bottom: 800, left: 50};
-var width = 1540 - marge.left - marge.right, 
-    height = 1500 - marge.top - marge.bottom;
+var margin = {top: 100, right: 50, bottom: 100, left: 50 };
 
-var fons = d3.select("body").append("svg")
-    .attr("width", width + marge.left + marge.right)
-    .attr("height", height + marge.top + marge.bottom)
-    .append("g")
-    .attr("transform", "translate(" + marge.left + "," + marge.top + ")");
+var width = 1300 - margin.left - margin.right, height = 400 - margin.top - margin.bottom;
 
-var areaEstrella = d3.select("svg").append("g");
+var starArea = d3.select("svg").append("g");
 
-//Configuració estrelles 
-var config = {
-    padding: 10,
-    eix: 1.4,
-    velocitat: [0.01, 0],
-    radiEstrella: 1,
-    radiLluminositat: 2
-};
+var config = {padding: 10, axisMultiplier: 1.4, velocity: [0.01, 0], starRadius: 1, glowRadius: 2 };
 
-var definicions = d3.select("svg").append("defs");
-var filtrar = definicions.append("filter")
-    .attr("id", "glow");
-    filtrar.append("feGaussianBlur")
-    .attr("class", "blur")
-    .attr("stdDeviation",config.radiLluminositat)
-    .attr("result", "coloredBlur");
-
-var feMerge = filtrar.append("feMerge") //Permet aplicar efectes concurrentment en comptes de seqüencialment
-    feMerge.append("feMergeNode")
-    .attr("in","coloredBlur");
-    feMerge.append("feMergeNode")
-    .attr("in","SourceGraphic");
-
-function generarEstrelles(nombre) {
-    var i;
-    var estrelles = areaEstrella.selectAll("circle") //Selecciona tots els elements que contenen el selector especificat
-        .data(d3.range(nombre).map(d =>  //Ús de map, a més de fer-ho amb format fletxa
-            i = {x: Math.random() * (width + marge.left + marge.right), y: Math.random() * (height + marge.top + marge.bottom), r: Math.random() * config.radiEstrella}
+function generateStars(number) {
+    var stars = starArea.selectAll("circle")
+        .data(d3.range(number).map( d =>  d = {
+                x: Math.random() * (width + margin.left + margin.right),
+                y: Math.random() * (height + margin.top + margin.bottom),
+                r: Math.random() * config.starRadius
+            }
         ))
         .enter().append("circle")
-            .attr("class","star")
-            .attr("cx", d => d.x)
-            .attr("cy", d => d.y)
-            .attr('r', d => d.r);
+        .attr("class", "star")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", d => d.r);
 }
 
-function mostrarPlanetes(configuracio, planetes) {
-    var delimitarMida = (width / planetes.length) - configuracio.padding;
+function displayPlanets(cfg, planets) {
+    d3.select("svg").remove();
+    var svg = d3.select("#planetes").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var definitions = d3.select("svg").append("defs");
+    var filter = definitions.append("filter")
+        .attr("id", "glow");
+    filter.append("feGaussianBlur")
+        .attr("class", "blur")
+        .attr("stdDeviation", config.glowRadius)
+        .attr("result", "coloredBlur");
+    var feMerge = filter.append("feMerge")
+    feMerge.append("feMergeNode")
+        .attr("in", "coloredBlur");
+    feMerge.append("feMergeNode")
+        .attr("in", "SourceGraphic");
+    var boundingSize = (width / planets.length) - cfg.padding;
 
-    var delimitarArea = fons.append("g")
+    var boundingArea = svg.append("g")
         .selectAll("g")
-        .data(planetes)
+        .data(planets)
         .enter().append("g")
-            .attr("transform", (d, i) => "translate(" + [i * (delimitarMida + configuracio.padding), height / 2] + ")")
-        .on("mouseover", mostrarInfo)
-        .on("mouseout", amagarInfo);
+        .attr("transform", (d, i) => "translate(" + [i * (boundingSize + cfg.padding), height / 2] + ")")
+        .on("mouseover", showInfo)
+        .on("mouseout", hideInfo);
 
-    var delimitarRectangle = delimitarArea.append("rect")
+    var boundingRect = boundingArea.append("rect")
         .attr("class", "bounding-box")
-        .attr("y", -delimitarMida / 2)
-        .attr("width", delimitarMida)
-        .attr("height", delimitarMida);
+        .attr("y", -boundingSize / 2)
+        .attr("width", boundingSize)
+        .attr("height", boundingSize);
 
-    var info = delimitarArea.append("g")
-        .attr("transform", "translate(" + [0, (delimitarMida / 2) + 18] + ")")
+    var info = boundingArea.append("g")
+        .attr("transform", "translate(" + [0, (boundingSize / 2) + 18] + ")")
         .attr("class", "info")
         .style("opacity", 0);
     info.append("text")
         .text(d => "Radi: " + d.radi + "km");
     info.append("text")
         .attr("y", 12)
-        .text(d => "Inclinació: " + d.angleRotacio + "°");
+        .text(d => "Massa: " + d.massa + "yg");
     info.append("text")
         .attr("y", 24)
-        .text(d => "Day Length: " + d.periode);
+        .text(d => "Període: " + d.periode);
 
-    var labels = delimitarArea.append("text")
+    var labels = boundingArea.append("text")
         .attr("class", "label")
-        .attr("y", -delimitarMida / 2)
+        .attr("y", -boundingSize / 2)
         .attr("dy", -12)
         .text(d => d.nom);
 
-    var escalarRadi = d3.scaleLinear()
-        .domain([0, d3.max(planetes, d => d.radi)])
-        .range([0, (delimitarMida / 2) - 3]);
+    var radiusScale = d3.scaleLinear()
+        .domain([0, d3.max(planets, d => d.radi)])
+        .range([0, (boundingSize / 2) - 3]);
 
-    var escalarReticula = d3.scaleLinear()
-        .domain(d3.extent(planetes, d => d.radi))
-        .range([20,10]);
+    var graticuleScale = d3.scaleLinear()
+        .domain(d3.extent(planets, d => d.radi))
+        .range([20, 10]);
 
-    var planetes = delimitarArea.each((d) => { //Ús de funció fletxa
-        var x = d3.select(this); 
-        dibuixarPlaneta(x,d);
-        console.log("aa")
+    var planets = boundingArea.each(function (d) {
+        var x = d3.select(this);
+        drawPlanet(x, d);
     });
 
-    function dibuixarPlaneta(element, data) {
-        var rotacio = [0, 0, data.angleRotacio];
+    function drawPlanet(element, data) {
+        var rotation = [0, 0, data.angleRotacio];
 
-        var projeccio = d3.geoOrthographic()
-            .translate([0,0])
-            .scale(escalarRadi(data.radi))
+        var projection = d3.geoOrthographic()
+            .translate([0, 0])
+            .scale(radiusScale(data.radi))
             .clipAngle(90)
             .precision(0.1);
 
-        var ruta = d3.geoPath()
-            .projection(projeccio);
-        
-        var reticula = d3.geoGraticule();
+        var path = d3.geoPath()
+            .projection(projection);
 
-        var planeta = element.append("g")
-            .attr("class","planet")
-            .attr("transform", "translate(" + [delimitarMida / 2, 0] + ")");
+        var graticule = d3.geoGraticule();
+
+        var planet = element.append("g")
+            .attr("class", "planet")
+            .attr("transform", "translate(" + [boundingSize / 2, 0] + ")");
 
         var defs = d3.select("svg").select("defs");
 
@@ -125,48 +115,71 @@ function mostrarPlanetes(configuracio, planetes) {
             .attr("cx", "25%")
             .attr("cy", "25%");
 
-            gradient.append("stop")
-            .attr("offset","5%")
+        gradient.append("stop")
+            .attr("offset", "5%")
             .attr("stop-color", data.color[0]);
 
-            gradient.append("stop")
-            .attr("offset","100%")
+        gradient.append("stop")
+            .attr("offset", "100%")
             .attr("stop-color", data.color[1]);
 
-        var eixos = planeta.append("line")
-            .attr("class","axis-line")
-            .attr("x1", -escalarRadi(data.radi) * configuracio.eix)
-            .attr("x2", escalarRadi(data.radi) * configuracio.eix)
+        var axis = planet.append("line")
+            .attr("class", "axis-line")
+            .attr("x1", -radiusScale(data.radi) * cfg.axisMultiplier)
+            .attr("x2", radiusScale(data.radi) * cfg.axisMultiplier)
             .attr("transform", "rotate(" + (90 - data.angleRotacio) + ")");
 
-        var dibuixar = planeta.append("circle")
-            .attr("r", escalarRadi(data.radi))
+        var fill = planet.append("circle")
+            .attr("r", radiusScale(data.radi))
             .style("fill", "url(#gradient" + data.nom + ")")
             .style("filter", "url(#glow)");
 
-        var liniesEix = planeta.append("path")
-            .attr("class","graticule")
-            .datum(reticula.step([escalarReticula(data.radi), escalarReticula(data.radi)]))
-            .attr("d", ruta);
+        var gridLines = planet.append("path")
+            .attr("class", "graticule")
+            .datum(graticule.step([graticuleScale(data.radi), graticuleScale(data.radi)]))
+            .attr("d", path);
 
-        d3.timer((elapsed) => {
-            //Rotar la projecció
-            projeccio.rotate([rotacio[0] + elapsed * configuracio.velocitat[0] / data.periode, rotacio[1] + elapsed * configuracio.velocitat[1] / data.periode, rotacio[2]]);
-            //Redibuixar eixos
-            liniesEix.attr("d",ruta);
+        d3.timer(function (elapsed) {
+            projection.rotate([rotation[0] + elapsed * cfg.velocity[0] / data.periode, rotation[1] + elapsed * cfg.velocity[1] / data.periode, rotation[2]]);
+            gridLines.attr("d", path);
         })
     }
 }
 
-/*Funció per a ordenar els planetes en funció del seu radi
-var ordenarRadi = SISTEMASOLAR.sort((a,b) => {
-    return a.radi - b.radi;
+function showInfo(d) {
+    d3.select(this).select("g.info")
+        .transition()
+        .style("opacity", 1);
+}
+
+function hideInfo(d) {
+    d3.select(this).select("g.info")
+        .transition()
+        .style("opacity", 0);
+}
+
+generateStars(500);
+displayPlanets(config, SISTEMASOLAR);
+
+document.getElementById("radius_button").addEventListener("click", function () {
+    SISTEMASOLAR.sort(function (a, b) {
+        return b.radi - a.radi;
+    });
+    displayPlanets(config, SISTEMASOLAR);
 });
-*/
 
-var mostrarInfo = new Function("d", "d3.select(this).select(\"g.info\") .transition() .style(\"opacity\",1)"); //Creació de funcions de manera dinàmica
-var amagarInfo = new Function("d", "d3.select(this).select(\"g.info\") .transition() .style(\"opacity\",0)");
+document.getElementById("weight_button").addEventListener("click", function () {
+    SISTEMASOLAR.sort(function (a, b) {
+        return b.massa - a.massa;
+    });
+    displayPlanets(config, SISTEMASOLAR);
+});
 
-generarEstrelles(404);
-mostrarPlanetes(config, SISTEMASOLAR);
-areaEstrella.lower();
+document.getElementById("period_button").addEventListener("click", function () {
+    SISTEMASOLAR.sort(function (a, b) {
+        return b.periode - a.periode;
+    });
+    displayPlanets(config, SISTEMASOLAR);
+});
+
+starArea.lower();

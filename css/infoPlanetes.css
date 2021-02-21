@@ -1,47 +1,37 @@
-body { margin: 0; position: fixed; top: 0; right: 0; bottom: 0; left: 0; }
-    
-    svg {
-      background-color: black;
-    }
-    
-    .bounding-box {
-      fill: white;
-      fill-opacity: 0;
-      stroke: #fff;
-      stroke-opacity: 0.5;
-      stroke-dasharray: 3,3;
-    }
-    
-    .label {
-      font-family: monospace;
-      opacity: 1;
-      font-size: 10px;
-      fill: #fff;
-    }
-    
-    .info {
-      font-family: monospace;
-      opacity: 1;
-      font-size: 8px;
-      fill: #fff;
-    }
-    
-    .planet circle, .graticule {
-      fill: none;
-      stroke: #123;
-      stroke-opacity: 0.15;
-    }
-    
-    .planet circle {
-      stroke-width: 1px;
-    }
-    
-    .axis-line {
-      stroke: #fff;
-      stroke-opacity: 0.3;   
-    }
-    
-    .star {
-      fill: white;
-      opacity: 1;
-    }
+svg {
+  background-color: black;
+}
+
+.label {
+  font-family: monospace;
+  opacity: 1;
+  font-size: 10px;
+  fill: #fff;
+}
+
+.info {
+  font-family: monospace;
+  opacity: 1;
+  font-size: 8px;
+  fill: #fff;
+}
+
+.planet circle, .graticule {
+  fill: none;
+  stroke: #123;
+  stroke-opacity: 0.15;
+}
+
+.planet circle {
+  stroke-width: 1px;
+}
+
+.axis-line {
+  stroke: #fff;
+  stroke-opacity: 0.3;   
+}
+
+.star {
+  fill: white;
+  opacity: 1;
+}
