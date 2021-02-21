@@ -5,14 +5,14 @@ svg {
 .label {
   font-family: monospace;
   opacity: 1;
-  font-size: 12px;
+  font-size: 10px;
   fill: #fff;
 }
 
 .info {
   font-family: monospace;
   opacity: 1;
-  font-size: 10px;
+  font-size: 8px;
   fill: #fff;
 }
 

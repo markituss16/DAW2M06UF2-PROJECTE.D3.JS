@@ -1,14 +1,56 @@
 import { SISTEMASOLAR } from './sistemaSolar.js';
 
+const DB_VERSION = 19;
+var ASTRES = [];
+
+var db;
+
+let indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {
+    READ_WRITE: "readwrite"
+};
+window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+
+var peticioObertura = indexedDB.open("ASTRES", DB_VERSION);
+
+peticioObertura.onerror = function (event) {
+    alert("Problema!");
+};
+
+peticioObertura.onupgradeneeded = function() {
+    db = open.result;
+    var store = db.createObjectStore("astres", {keyPath: "nom"});
+};
+
+peticioObertura.onsuccess = function () {
+    db = open.result;
+    desar();
+    recuperar();
+    console.log(ASTRES);
+};
+
+function desar() {
+    var tx = db.transaction("astres", "readwrite");
+    var store = tx.objectStore("astres");
+
+    let compt = 0;
+    for(let a of SISTEMASOLAR){
+        for(var i in a){
+            store.put(a[i]);
+        }
+        compt ++;
+    }
+}
+
+function recuperar() {
+    for(let a of SISTEMASOLAR){
+        ASTRES.push(store.get(a.nom));
+    }
+}
+
 var margin = {top: 100, right: 50, bottom: 100, left: 50 };
 
-var width = 1300 - margin.left - margin.right, height = 400 - margin.top - margin.bottom;
-
-var svg = d3.select("body").append("svg")
-.attr("width", width + margin.left + margin.right)
-.attr("height", height + margin.top + margin.bottom)
-.append("g")
-.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var width = 1500 - margin.left - margin.right, height = 400 - margin.top - margin.bottom;
 
 var config = {padding: 10, axisMultiplier: 1.4, velocity: [0.01, 0], starRadius: 1, glowRadius: 2 };
 
@@ -22,16 +64,15 @@ function displayPlanets(cfg, planets) {
     var definitions = d3.select("svg").append("defs");
     var filter = definitions.append("filter")
         .attr("id", "glow");
-        filter.append("feGaussianBlur")
+    filter.append("feGaussianBlur")
         .attr("class", "blur")
         .attr("stdDeviation", config.glowRadius)
         .attr("result", "coloredBlur");
     var feMerge = filter.append("feMerge")
-        feMerge.append("feMergeNode")
+    feMerge.append("feMergeNode")
         .attr("in", "coloredBlur");
-        feMerge.append("feMergeNode")
+    feMerge.append("feMergeNode")
         .attr("in", "SourceGraphic");
-
     var boundingSize = (width / planets.length) - cfg.padding;
 
     var boundingArea = svg.append("g")
@@ -53,19 +94,43 @@ function displayPlanets(cfg, planets) {
         .attr("class", "info")
         .style("opacity", 0);
     info.append("text")
-        .text(d => "Radi: " + d.radi + "km");
+        .text(d => "Radi: " + d.radi + " Km")
+        .style("font-size", "14px");
     info.append("text")
         .attr("y", 12)
-        .text(d => "Massa: " + d.massa + "yg");
+        .text(d => "Massa: " + d.massa + " yg")
+        .style("font-size", "14px");
     info.append("text")
         .attr("y", 24)
-        .text(d => "Període: " + d.periode);
+        .text(d => "Període: " + d.periode + " dies")
+        .style("font-size", "14px");
+    info.append("text")
+        .attr("y", 36)
+        .text(d => "Edat: " + d.edat + " Bilions d'anys")
+        .style("font-size", "14px");
+    info.append("text")
+        .attr("y", 48)
+        .text(d => "Velocitat R.: " + d.vRotacio + " Km/s")
+        .style("font-size", "14px");
+    info.append("text")
+        .attr("y", 60)
+        .text(d => "Angle de rotació: " + d.angleRotacio + " º")
+        .style("font-size", "14px");
+    info.append("text")
+        .attr("y", 72)
+        .text(d => "" + d.metodePolimorfisme1())
+        .style("font-size", "14px");
+    info.append("text")
+        .attr("y", 85)
+        .text(d => "" + d.metodePolimorfisme2())
+        .style("font-size", "14px");
 
     var labels = boundingArea.append("text")
         .attr("class", "label")
         .attr("y", -boundingSize / 2)
         .attr("dy", -12)
-        .text(d => d.nom);
+        .text(d => d.nom)
+        .style("font-size", "14px");
 
     var radiusScale = d3.scaleLinear()
         .domain([0, d3.max(planets, d => d.radi)])
@@ -129,7 +194,7 @@ function displayPlanets(cfg, planets) {
             .datum(graticule.step([graticuleScale(data.radi), graticuleScale(data.radi)]))
             .attr("d", path);
 
-        d3.timer((elapsed) => {
+        d3.timer(function (elapsed) {
             projection.rotate([rotation[0] + elapsed * cfg.velocity[0] / data.periode, rotation[1] + elapsed * cfg.velocity[1] / data.periode, rotation[2]]);
             gridLines.attr("d", path);
         })
@@ -143,21 +208,21 @@ var hideInfo = new Function("d", "d3.select(this).select(\"g.info\") .transition
 displayPlanets(config, SISTEMASOLAR);
 
 document.getElementById("radius_button").addEventListener("click", function () {
-    SISTEMASOLAR.sort((a, b) => {
+    SISTEMASOLAR.sort(function (a, b) {
         return b.radi - a.radi;
     });
     displayPlanets(config, SISTEMASOLAR);
 });
 
 document.getElementById("weight_button").addEventListener("click", function () {
-    SISTEMASOLAR.sort((a, b) => {
+    SISTEMASOLAR.sort(function (a, b) {
         return b.massa - a.massa;
     });
     displayPlanets(config, SISTEMASOLAR);
 });
 
 document.getElementById("period_button").addEventListener("click", function () {
-    SISTEMASOLAR.sort((a, b) => {
+    SISTEMASOLAR.sort(function (a, b) {
         return b.periode - a.periode;
     });
     displayPlanets(config, SISTEMASOLAR);

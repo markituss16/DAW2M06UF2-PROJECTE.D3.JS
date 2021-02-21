@@ -1,5 +1,5 @@
 class Astre {
-    constructor(nom, radi, massa, edat, color, centre, vRotacio, angleRotacio, descripcio) {
+    constructor(nom, radi, massa, edat, color, centre, vRotacio, angleRotacio, descripcio, periode) {
         this.nom = nom;
         this.radi = radi;
         this.massa = massa;
@@ -9,10 +9,15 @@ class Astre {
         this.vRotacio = vRotacio;
         this.angleRotacio = angleRotacio;
         this.descripcio = descripcio;
+        this.periode = periode;
     }
 
-    calculArea() {
-        return this.radi*this.radi*Math.PI;
+    metodePolimorfism1() {
+        return "No implementat";
+    }
+
+    metodePolimorfism2() {
+        return "No implementat";
     }
 
 }

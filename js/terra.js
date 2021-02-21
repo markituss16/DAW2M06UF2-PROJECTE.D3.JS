@@ -3,12 +3,12 @@ var width = 600,
 	sens = 0.25,
 	focused;
 
-var mesos = ["Gener", "Febrer", "Març", "Abril", "Maig", "Juny", "Juliol", "Agost", "Setembre", "Octubre", "Novembre","Desembre"];
+var mesos = new Set (["Gener", "Febrer", "Març", "Abril", "Maig", "Juny", "Juliol", "Agost", "Setembre", "Octubre", "Novembre","Desembre"]);
 
 var selected_year = 2004;
 var selected_month = 4;
 
-var colors = ['#1EFFFF', '#24FFFF', '#2AFFFF', '#30FFFF', '#36FFFF', '#3CFFFF', '#42FFFF', '#48FFFF', '#4EFFFF',
+var colors = new Set (['#1EFFFF', '#24FFFF', '#2AFFFF', '#30FFFF', '#36FFFF', '#3CFFFF', '#42FFFF', '#48FFFF', '#4EFFFF',
 	'#54FFFF', '#5AFFFF', '#60FFFF', '#66FFFF', '#6CFFFF', '#72FFFF', '#78FFFF', '#7EFFFF', '#84FFFF', '#8AFFFF',
 	'#90FFFF', '#96FFFF', '#9CFFFF', '#A2FFFF', '#A8FFFF', '#AEFFFF', '#B4FFFF', '#BAFFFF', '#C0FFFF', '#C6FFFF',
 	'#CCFFFF', '#D2FFFF', '#D8FFFF', '#DEFFFF', '#E4FFFF', '#EAFFFF', '#F0FFFF', '#F6FFFF', '#FCFFFF', '#FFFCFC',
@@ -17,7 +17,7 @@ var colors = ['#1EFFFF', '#24FFFF', '#2AFFFF', '#30FFFF', '#36FFFF', '#3CFFFF', 
     '#FF7E7E', '#FF7878', '#FF7272', '#FF6C6C', '#FF6666', '#FF6060', '#FF5A5A', '#FF5454', '#FF4E4E', '#FF4848', 
     '#FF4242', '#FF3C3C', '#FF3636', '#FF3030', '#FF2A2A', '#FF2424', '#FF1E1E', '#FF1818', '#FF1212', '#FF0C0C', 
     '#FF0606', '#FF0000'
-    ];
+    ]);
 
 //Setting projection
 var projection = d3.geo.orthographic()
@@ -107,7 +107,7 @@ function ready(error, world, countryData) {
 		//Mouse events
 
 		.on("mouseover", function (d) {
-			countryTooltip.text(countryById[d.id] + " " + d.id )
+			countryTooltip.text(countryById[d.id])
                 .style("left", (d3.event.pageX + 7) + "px")
                 .style("top", (d3.event.pageY - 15) + "px")
                 .style("display", "block")
@@ -125,7 +125,14 @@ function ready(error, world, countryData) {
 
 	d3.select("#slider_month").on("input", function () {
 		selected_month = +this.value;
-		document.getElementById("label_month").innerHTML = "Mes: " + mesos[selected_month - 1];
+
+		let compt = 0;
+		for(let m of mesos){
+			if( compt == selected_month - 1){
+				document.getElementById("label_month").innerHTML = "Mes: " + m;
+			}
+			compt ++;
+		}
 
         filtered_data = dataset_cleaned.filter(row => +row.year === selected_year && +row.month === selected_month);
 		map_data = new Map();
@@ -154,7 +161,13 @@ function ready(error, world, countryData) {
 		while (temperature > j && j < 40) {
 			j = j + 1;
 		}
-		newColor = colors[j + 40];
+		let compt = 0;
+		for(let c of colors){
+			if( compt == j +40){
+				newColor = c;
+			}
+			compt ++;
+		}
 		if (temperature !== undefined) {
 			d3.select(this).attr("style", "fill: " + newColor);
 		} else {
