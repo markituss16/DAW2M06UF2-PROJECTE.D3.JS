@@ -1,7 +1,7 @@
 import { SISTEMASOLAR } from './sistemaSolar.js';
 
 const DB_VERSION = 19;
-var ASTRES = [];
+var ASTRES = [{SISTEMASOLAR}];
 
 var db;
 
@@ -11,42 +11,74 @@ window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || 
 };
 window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
-var peticioObertura = indexedDB.open("ASTRES", DB_VERSION);
+var peticioObertura = indexedDB.open("astresBD", DB_VERSION);
 
-peticioObertura.onerror = function (event) {
-    alert("Problema!");
-};
+peticioObertura.onupgradeneeded = function(e) {
+    var thisDB = e.target.result;
 
-peticioObertura.onupgradeneeded = function() {
-    db = open.result;
-    var store = db.createObjectStore("astres", {keyPath: "nom"});
-};
+    if(!thisDB.objectStoreNames.contains("astres")) {
+        var objectStore = thisDB.createObjectStore("astres", {keyPath: "id", autoIncrement: true});
+        objectStore.createIndex('nom', 'nom', {unique: false});
+        objectStore.createIndex('radi', 'radi', {unique: false});
+        objectStore.createIndex('massa', 'massa', {unique: false});
+        objectStore.createIndex('edat', 'edat', {unique: false});
+        objectStore.createIndex('color', 'color', {unique: false});
+        objectStore.createIndex('centre', 'centre', {unique: false});
+        objectStore.createIndex('vRotacio', 'vRotacio', {unique: false});
+        objectStore.createIndex('angleRotacio', 'angleRotacio', {unique: false});
+        objectStore.createIndex('periode', 'periode', {unique: false});
+    }
+    //addData();
+}
 
-peticioObertura.onsuccess = function () {
-    db = open.result;
-    desar();
-    recuperar();
-    console.log(ASTRES);
-};
+function addData() {
+    console.log("aaa");
+    var transaction = db.transaction(["astres"], "readwrite");
+    var objectStore = transaction.objectStore("astres");
+    var nom = $("#nom").val();
+    var radi = $("#radi").val();
+    var massa = $("edat").val();
+    var edat = $("color").val.split(",");
+    console.log("afegint " + nom + "radi " + radi);
+    var req = objectStore.add({nom: nom, radi: radi});
+    req.onsuccess = function() {
+        console.log("Dades afegides");
+    };
+}
 
-function desar() {
-    var tx = db.transaction("astres", "readwrite");
-    var store = tx.objectStore("astres");
+/*peticioObertura.addEventListener('error', mostrarError);
+peticioObertura.addEventListener('iniciar',iniciar);
+peticioObertura.addEventListener('upgradeneeded', crearBD);
 
-    let compt = 0;
-    for(let a of SISTEMASOLAR){
-        for(var i in a){
-            store.put(a[i]);
+function mostrarError(e) {
+    alert('Error: ' + e.code + '' + e.message);
+} 
+
+function iniciar(e) {
+    db = e.target.result;
+}
+
+function crearBD(e) {
+    var base = e.target.result;
+    var desar = base.createObjectStore('astres', {keypath: 'id'});
+    desar.createIndex('buscarNom', 'nom', {unique: false});
+    desar.createIndex('buscarRadi', 'radi', {unique: false});
+    desar.createIndex('buscarMassa', 'massa', {unique: false});
+    desar.createIndex('buscarEdat', 'edat', {unique: false});
+    desar.createIndex('buscarColor', 'color', {unique: false});
+    desar.createIndex('buscarCentre', 'centre', {unique: false});
+    desar.createIndex('buscarVRotacio', 'vRotacio', {unique: false});
+    desar.createIndex('buscarAngleRotacio', 'angleRotacio', {unique: false});
+    desar.createIndex('buscarPeriode', 'periode', {unique: false});
+
+    desar.transaction.oncomplete = function(e){
+        var desarInfo = db.transaction("astres", "readwrite").desar("astres");
+        for (var i in ASTRES) {
+            desarInfo.add(ASTRES[i]);
         }
-        compt ++;
     }
-}
-
-function recuperar() {
-    for(let a of SISTEMASOLAR){
-        ASTRES.push(store.get(a.nom));
-    }
-}
+};
+*/
 
 var margin = {top: 100, right: 50, bottom: 100, left: 50 };
 
