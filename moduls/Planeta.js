@@ -5,6 +5,7 @@ class Planeta extends Astre {
         super(nom, radi, massa, edat, color, centre, vRotacio, angleRotacio, descripcio, periode);
         this.gravetat = gravetat;
         this.velocitat = velocitat;
+        this.start = undefined;
     }
 
     metodePolimorfisme1(){
