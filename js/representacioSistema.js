@@ -1,14 +1,28 @@
 import {SISTEMASOLAR} from "../moduls/sistemaSolar.js";
 
 var orbitsOn = true;
-  
-var config = {padding: 10, axisMultiplier: 1.4, velocity: [0.01, 0], starRadius: 1, glowRadius: 2 };
 
-const radis = [2, 0.025, .5, .5, 0.11, 2.25, 1.5, 1, 1];
+const radis = [];
 
-const radisOrbitals = [0, 1, 2.5, 3.45, 4.3, 5.33, 6.4, 7.2, 8];
+for(let p of SISTEMASOLAR){
+  for(let prop in p){
+    if(prop == "radi"){
+      radis.push(p[prop]/24764);
+    }
+  }
+}
 
-const velocitats = [100000, -50000, 70000, -30000, -60000, 90000, 40000, -30000, 50000];
+const radisOrbitals = [0, 0.9, 1.5, 1.9, 2.5, 3.5, 5, 6.8, 9.5];
+
+const velocitats = [0];
+
+for(let p of SISTEMASOLAR){
+  for(let prop in p){
+    if(prop == "velocitat"){
+      velocitats.push(p[prop]*10000);
+    }
+  }
+}
 
 var cua = [];
 

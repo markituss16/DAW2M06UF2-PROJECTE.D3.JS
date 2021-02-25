@@ -28,6 +28,7 @@ peticioObertura.onupgradeneeded = function(e) {
         objectStore.createIndex('angleRotacio', 'angleRotacio', {unique: false});
         objectStore.createIndex('periode', 'periode', {unique: false});
     }
+    //addData();
 }
 
 function addData() {
@@ -43,7 +44,7 @@ function addData() {
     }
 }
 
-//addData();
+
 /*
 const DB_VERSION = 19;
 var ASTRES = [];
