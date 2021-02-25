@@ -8,6 +8,9 @@ var mesos = new Set (["Gener", "Febrer", "Març", "Abril", "Maig", "Juny", "Juli
 var selected_year = 2004;
 var selected_month = 4;
 
+//piles
+var temperatures1, temperatures2;
+
 var colors = new Set (['#1EFFFF', '#24FFFF', '#2AFFFF', '#30FFFF', '#36FFFF', '#3CFFFF', '#42FFFF', '#48FFFF', '#4EFFFF',
 	'#54FFFF', '#5AFFFF', '#60FFFF', '#66FFFF', '#6CFFFF', '#72FFFF', '#78FFFF', '#7EFFFF', '#84FFFF', '#8AFFFF',
 	'#90FFFF', '#96FFFF', '#9CFFFF', '#A2FFFF', '#A8FFFF', '#AEFFFF', '#B4FFFF', '#BAFFFF', '#C0FFFF', '#C6FFFF',
@@ -136,22 +139,39 @@ function ready(error, world, countryData) {
 
         filtered_data = dataset_cleaned.filter(row => +row.year === selected_year && +row.month === selected_month);
 		map_data = new Map();
+		temperatures2 = [];
 		for (let r of filtered_data) {
 			map_data.set(r["country"], r["temperature"]);
 		}
+		for (let r of filtered_data) {
+			temperatures2.push(r["temperature"]);
+		}
 		render(map_data);
+		const reducer = (acumulator, currentValue) => acumulator + currentValue;
+		document.getElementById("label_mitjana").innerHTML = "Temperatura mitjana d'aquest mes i any: " + (temperatures2.reduce(reducer)/temperatures2.length).toFixed(2);
+		for(let i=0; i< temperatures2.length; i++){
+			temperatures2.pop();
+		}
 	});
 
 	d3.select("#slider_year").on("input", function () {
 		selected_year = +this.value;
 		document.getElementById("label_year").innerHTML = "Any: " + selected_year;
-
         filtered_data = dataset_cleaned.filter(row => +row.year === selected_year && +row.month === selected_month);
 		map_data = new Map();
+		temperatures1 = [];
 		for (let r of filtered_data) {
 			map_data.set(r["country"], r["temperature"]);
 		}
+		for (let r of filtered_data) {
+			temperatures1.push(r["temperature"]);
+		}
 		render(map_data);
+		const reducer = (acumulator, currentValue) => acumulator + currentValue;
+		document.getElementById("label_mitjana").innerHTML = "Temperatura mitjana d'aquest mes i any: " + (temperatures1.reduce(reducer)/temperatures1.length).toFixed(2);
+		for(let i=0; i< temperatures1.length; i++){
+			temperatures1.pop();
+		}
 	});
 
 	function changeColor(d, i) {
