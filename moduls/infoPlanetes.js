@@ -3,97 +3,77 @@ import { SISTEMASOLAR } from './sistemaSolar.js';
 const DB_VERSION = 19;
 var ASTRES = [];
 
-var db;
-
+//no utilitzar var
 let indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {
     READ_WRITE: "readwrite"
 };
 window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
-var peticioObertura = indexedDB.open("astresBD", DB_VERSION);
-
-peticioObertura.onupgradeneeded = function(e) {
-    var thisDB = e.target.result;
-
-    if(!thisDB.objectStoreNames.contains("astres")) {
-        var objectStore = thisDB.createObjectStore("astres", {keyPath: "id", autoIncrement: true});
-        objectStore.createIndex('nom', 'nom', {unique: false});
-        objectStore.createIndex('radi', 'radi', {unique: false});
-        objectStore.createIndex('massa', 'massa', {unique: false});
-        objectStore.createIndex('edat', 'edat', {unique: false});
-        objectStore.createIndex('color', 'color', {unique: false});
-        objectStore.createIndex('centre', 'centre', {unique: false});
-        objectStore.createIndex('vRotacio', 'vRotacio', {unique: false});
-        objectStore.createIndex('angleRotacio', 'angleRotacio', {unique: false});
-        objectStore.createIndex('periode', 'periode', {unique: false});
-    }
-    //addData();
-}
-
-function addData() {
-    console.log("aaa");
-    var transaction = db.transaction(["astres"], "readwrite");
-    var objectStore = transaction.objectStore("astres");
-    for(let a of SISTEMASOLAR){
-        console.log("afegint " + nom + "radi " + radi);
-        var req = objectStore.add({nom: a["nom"], radi: a["radi"], massa: a["massa"], edat: a["edat"], color: a["color"]});
-        req.onsuccess = function() {
-            console.log("Dades afegides");
-        };
-    }
-}
-
-
-/*
-const DB_VERSION = 19;
-var ASTRES = [];
-
+//la petició d'obertura no crea la DB, retorna de manera asíncrona un IDBOpenDBRequest, amb un objecte exit o error.
+var peticioObertura = window.indexedDB.open("SISTEMASOLAR", DB_VERSION);
 var db;
-
-let indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {
-    READ_WRITE: "readwrite"
-};
-window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
-
-var peticioObertura = indexedDB.open("ASTRES", DB_VERSION);
 
 peticioObertura.onerror = function (event) {
     alert("Problema!");
 };
-
-peticioObertura.onupgradeneeded = function() {
-    db = open.result;
-    var store = db.createObjectStore("astres", {keyPath: "nom"});
+peticioObertura.onsuccess = function (event) {
+    db = event.target.result;
 };
+peticioObertura.onupgradeneeded = function (event) {
+    var db = event.target.result;
+    try {
+        db.deleteObjectStore("astres");
 
-peticioObertura.onsuccess = function () {
-    db = open.result;
-    desar();
-    recuperar();
-    console.log(ASTRES);
-};
+    }
+    catch (e) {
 
-function desar() {
-    var tx = db.transaction("astres", "readwrite");
-    var store = tx.objectStore("astres");
+    }
+    // ObjectStore conté la informació sobre els nostres clients. El codi
+    // "SSN" es la ruta de la clau perquè es garanteix que sigui única
+    var magatzemObjsClients = db.createObjectStore("astres", {
+        keyPath: "nom"
+    });
 
-    let compt = 0;
-    for(let a of SISTEMASOLAR){
-        for(var i in a){
-            store.put(a[i]);
+    // Utilitzeu la transacció OnComplete per assegurar-se que la creació és ObjectStore
+    // Acabat abans d'afegir dades en ell.
+    magatzemObjsClients.transaction.oncomplete = function (event) {
+        // Emmagatzemar els valors de la magatzemObjsClients acabat de crear.
+        var magatzemObjsClients = db.transaction("astres", "readwrite").objectStore("astres");
+        for (var i in SISTEMASOLAR) {
+            console.log(SISTEMASOLAR[i]);
+            var peticio = magatzemObjsClients.add(SISTEMASOLAR[i]);
         }
-        compt ++;
-    }
-}
 
-function recuperar() {
-    for(let a of SISTEMASOLAR){
-        ASTRES.push(store.get(a.nom));
-    }
-}
-*/
+        var peticio = magatzemObjsClients.get("Sol");
+        peticio = magatzemObjsClients.get("Mercuri");
+        peticio = magatzemObjsClients.get("Venus");
+        peticio = magatzemObjsClients.get("Terra");
+        peticio = magatzemObjsClients.get("Júpiter");
+        peticio = magatzemObjsClients.get("Saturn");
+        peticio = magatzemObjsClients.get("Úra");
+        peticio = magatzemObjsClients.get("Neptú");
+
+        peticio.onerror = function (event) {
+
+        };
+        peticio.onsuccess = function (event) {
+            ASTRES.push(peticio.result.nom);
+        };
+        
+
+        magatzemObjsClients.openCursor().onsuccess = function (event) {
+            var cursor = event.target.result;
+            if (cursor) {
+                console.log(cursor.key + " es " + cursor.value.nom);
+                cursor.continue();
+            }
+        };
+
+
+    };
+};
+
 var margin = {top: 100, right: 50, bottom: 100, left: 50 };
 
 var width = 1500 - margin.left - margin.right, height = 400 - margin.top - margin.bottom;
@@ -271,5 +251,5 @@ document.getElementById("period_button").addEventListener("click", function () {
     SISTEMASOLAR.sort(function (a, b) {
         return b.periode - a.periode;
     });
-    displayPlanets(config, SISTEMASOLAR);
+    displayPlanets(config, ASTRES);
 });
