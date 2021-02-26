@@ -5,6 +5,7 @@ class Estrella extends Astre {
         super(nom, radi, massa, edat, color, centre, vRotacio, angleRotacio, descripcio, periode);
         this.tSuperficial = tSuperficial;
         this.lluminositat = lluminositat;
+        this.gravetat = 273;
     }
 
     metodePolimorfisme1(){

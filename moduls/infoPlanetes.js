@@ -1,10 +1,15 @@
 import { SISTEMASOLAR } from './sistemaSolar.js';
+import { Planeta } from './Planeta.js';
+import { Estrella } from './Estrella.js';
 
 const DB_VERSION = 19;
 var ASTRES = [];
+var p;
+let punt = new Object({x:0, y:0});
+let colors = new Object({sol: ['#FFFF00', '#FF0000'], mercuri: ["#E7E8EC", "#B1ADAD"], venus: ["#F8E2B0", "#D3A567"], terra: ["#9FC164", "#6B93D6"], mart: ["#EF1501", "#AD0000"], jupiter: ["#D8CA9D", "#A59186"], saturn: ["#F4D587", "#F4A587"], ura: ["#E1EEEE", "#ADB0C3"], neptu:  ["#85ADDB", "#3F54BA"]});
 
 //no utilitzar var
-let indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+//window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {
     READ_WRITE: "readwrite"
 };
@@ -19,7 +24,56 @@ peticioObertura.onerror = function (event) {
 };
 peticioObertura.onsuccess = function (event) {
     db = event.target.result;
+    var magatzemObjsClients = db.transaction("astres", "readwrite").objectStore("astres");
+    magatzemObjsClients.openCursor().onsuccess = function (event) {
+        magatzemObjsClients.get("Sol")
+        .onsuccess = function (event) {
+            p = new Estrella(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.sol), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.tSuperficial, this.result.lluminositat, this.result.periode);
+            ASTRES.push(p) ;
+        };
+        magatzemObjsClients.get("Mercuri")
+        .onsuccess = function (event) {
+            p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.mercuri), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+            ASTRES.push(p) ;
+        };
+        magatzemObjsClients.get("Venus")
+        .onsuccess = function (event) {
+            p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.venus), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+            ASTRES.push(p) ;
+        };
+        magatzemObjsClients.get("Terra")
+        .onsuccess = function (event) {
+            p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.terra), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+            ASTRES.push(p) ;
+        };
+        magatzemObjsClients.get("Mart")
+        .onsuccess = function (event) {
+            p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.mart), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+            ASTRES.push(p) ;
+        };
+        magatzemObjsClients.get("Júpiter")
+        .onsuccess = function (event) {
+            p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.jupiter), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+            ASTRES.push(p) ;
+        };
+        magatzemObjsClients.get("Saturn")
+        .onsuccess = function (event) {
+            p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.saturn), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+            ASTRES.push(p) ;
+        };
+        magatzemObjsClients.get("Urà")
+        .onsuccess = function (event) {
+            p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.ura), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+            ASTRES.push(p) ;
+        };
+        magatzemObjsClients.get("Neptú")
+        .onsuccess = function (event) {
+            p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.neptu), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+            ASTRES.push(p) ;
+        };
+    }
 };
+
 peticioObertura.onupgradeneeded = function (event) {
     var db = event.target.result;
     try {
@@ -38,34 +92,66 @@ peticioObertura.onupgradeneeded = function (event) {
     // Utilitzeu la transacció OnComplete per assegurar-se que la creació és ObjectStore
     // Acabat abans d'afegir dades en ell.
     magatzemObjsClients.transaction.oncomplete = function (event) {
+        var compt = 0;
         // Emmagatzemar els valors de la magatzemObjsClients acabat de crear.
         var magatzemObjsClients = db.transaction("astres", "readwrite").objectStore("astres");
         for (var i in SISTEMASOLAR) {
-            console.log(SISTEMASOLAR[i]);
-            var peticio = magatzemObjsClients.add(SISTEMASOLAR[i]);
-        }
-
-        var peticio = magatzemObjsClients.get("Sol");
-        peticio = magatzemObjsClients.get("Mercuri");
-        peticio = magatzemObjsClients.get("Venus");
-        peticio = magatzemObjsClients.get("Terra");
-        peticio = magatzemObjsClients.get("Júpiter");
-        peticio = magatzemObjsClients.get("Saturn");
-        peticio = magatzemObjsClients.get("Úra");
-        peticio = magatzemObjsClients.get("Neptú");
-
-        peticio.onerror = function (event) {
-
-        };
-        peticio.onsuccess = function (event) {
-            ASTRES.push(peticio.result.nom);
-        };
-        
+            magatzemObjsClients.add(SISTEMASOLAR[i]);
+            /*.onsuccess = function (event){
+                if(compt==7){
+                    magatzemObjsClients.get("Sol")
+                    .onsuccess = function (event) {
+                        p = new Estrella(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.sol), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.tSuperficial, this.result.lluminositat, this.result.periode);
+                        ASTRES.push(p) ;
+                    };
+                    magatzemObjsClients.get("Mercuri")
+                    .onsuccess = function (event) {
+                        p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.mercuri), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+                        ASTRES.push(p) ;
+                    };
+                    magatzemObjsClients.get("Venus")
+                    .onsuccess = function (event) {
+                        p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.venus), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+                        ASTRES.push(p) ;
+                    };
+                    magatzemObjsClients.get("Terra")
+                    .onsuccess = function (event) {
+                        p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.terra), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+                        ASTRES.push(p) ;
+                    };
+                    magatzemObjsClients.get("Mart")
+                    .onsuccess = function (event) {
+                        p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.mart), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+                        ASTRES.push(p) ;
+                    };
+                    magatzemObjsClients.get("Júpiter")
+                    .onsuccess = function (event) {
+                        p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.jupiter), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+                        ASTRES.push(p) ;
+                    };
+                    magatzemObjsClients.get("Saturn")
+                    .onsuccess = function (event) {
+                        p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.saturn), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+                        ASTRES.push(p) ;
+                    };
+                    magatzemObjsClients.get("Urà")
+                    .onsuccess = function (event) {
+                        p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.ura), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+                        ASTRES.push(p) ;
+                    };
+                    magatzemObjsClients.get("Neptú")
+                    .onsuccess = function (event) {
+                        p = new Planeta(this.result.nom, this.result.radi, this.result.massa, this.result.edat, Object.create(colors.neptu), Object.create(punt), this.result.vRotacio, this.result.angleRotacio, this.result.descripcio, this.result.gravetat, this.result.velocitat, this.result.periode);
+                        ASTRES.push(p) ;
+                    };
+                }
+                compt ++;
+            }*/
+        }        
 
         magatzemObjsClients.openCursor().onsuccess = function (event) {
             var cursor = event.target.result;
             if (cursor) {
-                console.log(cursor.key + " es " + cursor.value.nom);
                 cursor.continue();
             }
         };
@@ -81,6 +167,9 @@ var width = 1500 - margin.left - margin.right, height = 400 - margin.top - margi
 var config = {padding: 10, axisMultiplier: 1.4, velocity: [0.01, 0], starRadius: 1, glowRadius: 2 };
 
 function displayPlanets(cfg, planets) {
+    for(let e of planets){
+        console.log(e);
+    }
     d3.select("svg").remove();
     var svg = d3.select("#planetes").append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -240,15 +329,29 @@ document.getElementById("radius_button").addEventListener("click", function () {
     displayPlanets(config, SISTEMASOLAR);
 });
 
-document.getElementById("weight_button").addEventListener("click", function () {
+document.getElementById("gravetat_button").addEventListener("click", function () {
     SISTEMASOLAR.sort(function (a, b) {
-        return b.massa - a.massa;
+        return b.gravetat - a.gravetat;
     });
     displayPlanets(config, SISTEMASOLAR);
 });
 
+document.getElementById("v_button").addEventListener("click", function () {
+    ASTRES.sort(function (a, b) {
+        return b.vRotacio - a.vRotacio;
+    });
+    displayPlanets(config, ASTRES);
+});
+
+document.getElementById("weight_button").addEventListener("click", function () {
+    ASTRES.sort(function (a, b) {
+        return b.massa - a.massa;
+    });
+    displayPlanets(config, ASTRES);
+});
+
 document.getElementById("period_button").addEventListener("click", function () {
-    SISTEMASOLAR.sort(function (a, b) {
+    ASTRES.sort(function (a, b) {
         return b.periode - a.periode;
     });
     displayPlanets(config, ASTRES);
