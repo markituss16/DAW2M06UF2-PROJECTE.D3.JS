@@ -1,8 +1,12 @@
+//Ús de mòduls
 import { Estrella } from './Estrella.js';
 import { Planeta } from './Planeta.js';
+
 //radi en Km, massa en yottagrams, edat en bilions d'anys, color en hexadecimal, Tsuperficial en K, Lluminositat en gigawatts, vRotacio en Km/s, gravetat en m/s^2, periode en dies, velocitat Km/s
+//Ús d'objectes prototipats
 let punt = new Object({x:0, y:0});
 let colors = new Object({sol: ['#FFFF00', '#FF0000'], mercuri: ["#E7E8EC", "#B1ADAD"], venus: ["#F8E2B0", "#D3A567"], terra: ["#9FC164", "#6B93D6"], mart: ["#EF1501", "#AD0000"], jupiter: ["#D8CA9D", "#A59186"], saturn: ["#F4D587", "#F4A587"], ura: ["#E1EEEE", "#ADB0C3"], neptu:  ["#85ADDB", "#3F54BA"]});
+
 const SISTEMASOLAR = [new Estrella('Sol', 69600, 1988550000, 4.57, Object.create(colors.sol), Object.create(punt), 1.997, 0, 'El Sol és una estrella situada al centre del sistema solar. Es tracta d\'una esfera gairebé perfecta de plasma calent portada a la incandescència per les reaccions de fusió nuclear que es produeixen al seu nucli i que radia energia majoritàriament en forma de llum visible i radiació infraroja. És amb molta diferència la font d\'energia més important per a la vida a la Terra. Té un diàmetre d\'aproximadament 1,39 milions de quilòmetres, xifra que equival a uns 109 diàmetres terrestres.', 5772, 382800000000000000, 28),
     new Planeta('Mercuri', 2439.7, 328.5, 4.6, Object.create(colors.mercuri), Object.create(punt), 0.0030, 0.03, 'Mercuri és el planeta més proper al Sol i el més petit del sistema solar.[9] Fa una volta al Sol cada 88 dies. Mercuri és brillant quan es veu des de la Terra, amb una magnitud aparent de −2,0 a 5,5, però no es veu fàcilment, ja que la seva màxima separació angular amb el Sol és només de 28,3°. Tan sols es pot veure a l\'alba i al crepuscle.', 3.7, -47,87, 58.65), 
     new Planeta('Venus', 6051.8, 4868.5, 4.5, Object.create(colors.venus), Object.create(punt), 0.0018, 2.64, 'Venus és el segon planeta en proximitat al Sol, al voltant del qual gira una vegada cada 224,7 dies terrestres. El planeta s\'anomena així en honor de Venus, la deessa romana de l\'amor. Sense comptar la Lluna, és l\'objecte natural més brillant al cel nocturn, arribant a una magnitud aparent de −4,6. Com que Venus és més interior que la Terra, sempre apareix a prop del Sol: la seva elongació arriba a un màxim de 47,8°. La brillantor màxima de Venus és poc abans de l\'alba o poc després de la posta, raó per la qual de vegades s\'anomena l\'estel de l\'alba, del matí o de la tarda.', 8.87, 35.02, -243), 

@@ -1,5 +1,7 @@
+//Ús de mòduls
 import { Astre } from './Astre.js';
 
+//Herència
 class Estrella extends Astre {
     constructor(nom, radi, massa, edat, color, centre, vRotacio, angleRotacio, descripcio, tSuperficial, lluminositat, periode) {
         super(nom, radi, massa, edat, color, centre, vRotacio, angleRotacio, descripcio, periode);
@@ -8,6 +10,7 @@ class Estrella extends Astre {
         this.gravetat = 273;
     }
 
+    //Aplicació de polimorfisme
     metodePolimorfisme1(){
         return "Temperatura Superficial: " + this.tSuperficial + " ºC";
     }

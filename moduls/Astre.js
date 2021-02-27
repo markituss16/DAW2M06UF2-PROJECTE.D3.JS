@@ -12,6 +12,7 @@ class Astre {
         this.periode = periode;
     }
 
+    //Aplicació polimorfisme
     metodePolimorfism1() {
         return "No implementat";
     }

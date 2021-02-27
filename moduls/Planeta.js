@@ -1,5 +1,7 @@
+//Ús de mòduls
 import { Astre } from './Astre.js';
 
+//Herència
 class Planeta extends Astre {
     constructor(nom, radi, massa, edat, color, centre, vRotacio, angleRotacio, descripcio, gravetat, velocitat, periode) {
         super(nom, radi, massa, edat, color, centre, vRotacio, angleRotacio, descripcio, periode);
@@ -8,6 +10,7 @@ class Planeta extends Astre {
         this.start = undefined;
     }
 
+    //Aplicació del polimorfisme
     metodePolimorfisme1(){
         return "Gravetat: " + this.gravetat + " m/s^2";
     }
